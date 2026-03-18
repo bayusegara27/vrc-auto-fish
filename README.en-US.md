@@ -15,6 +15,13 @@ An auto-fishing script for the VRChat world **FISH!**. It supports YOLO object d
 
 ## Quick Start
 
+### Option 0: Use `VRC Auto Fish Launcher` (best for most users)
+
+`VRC Auto Fish Launcher` is the downloader / launcher, not the fishing program itself.
+It is meant to handle downloading the app, checking for updates, preparing dependencies, and starting the main program for you, so users do not need to manage the environment manually.
+
+If you downloaded the `Launcher`, you usually do not need to run `启动.bat`, `install.bat`, or type setup commands yourself.
+
 ### Option 1: One-click launch (recommended)
 
 1. Install [Python 3.10+](https://www.python.org/downloads/) and enable **Add to PATH**
