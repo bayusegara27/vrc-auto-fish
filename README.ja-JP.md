@@ -182,7 +182,3 @@ EXE 版を使う場合は、パッチ zip をダウンロードして EXE と同
 
 - `.github/workflows/test.yml`: `push` / `pull_request` 時に Windows の軽量チェックを実行します
 - `.github/workflows/release-build.yml`: 手動で CUDA パッケージをビルドし、対象 GitHub Release に `7z` アセットをアップロードします
-
-## License
-
-MIT
