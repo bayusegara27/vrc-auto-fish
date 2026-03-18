@@ -182,7 +182,3 @@ python -m fish_trainer.gui
 
 - `.github/workflows/test.yml`：在 `push` / `pull_request` 时运行 Windows 轻量测试
 - `.github/workflows/release-build.yml`：手动触发 CUDA 构建，并将 `7z` 包上传到指定 GitHub Release
-
-## License
-
-MIT
