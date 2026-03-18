@@ -1,5 +1,5 @@
 # VRChat Auto Fishing Assistant (FISH!)
-
+Booth:https://scrtup.booth.pm/items/8095499
 This repository now provides documentation in three languages. Choose the version you want to read:
 
 - [简体中文](README.zh-CN.md)
