@@ -15,6 +15,9 @@ YOLO 目标检测器
 """
 
 import os
+import subprocess
+import sys
+import importlib.util
 import cv2
 import numpy as np
 import config
@@ -33,6 +36,20 @@ try:
     _NCNN_AVAILABLE = True
 except ImportError:
     ncnn = None
+
+_NCNN_REQUIREMENTS = ("ncnn>=1.0.20260114", "pnnx>=20260112")
+
+
+def _refresh_ncnn_import():
+    global _NCNN_AVAILABLE, ncnn
+    try:
+        import importlib
+        ncnn = importlib.import_module("ncnn")  # type: ignore
+        _NCNN_AVAILABLE = True
+    except Exception:
+        ncnn = None
+        _NCNN_AVAILABLE = False
+    return _NCNN_AVAILABLE
 
 
 class YoloDetector:
@@ -95,6 +112,39 @@ class YoloDetector:
         return _NCNN_AVAILABLE
 
     @staticmethod
+    def pnnx_available() -> bool:
+        return importlib.util.find_spec("pnnx") is not None
+
+    @staticmethod
+    def can_auto_install_ncnn() -> bool:
+        return not getattr(sys, "frozen", False)
+
+    @staticmethod
+    def auto_install_ncnn_dependencies() -> bool:
+        if YoloDetector.ncnn_available() and YoloDetector.pnnx_available():
+            return True
+        if not YoloDetector.can_auto_install_ncnn():
+            return False
+        log.info_t("yolo.log.ncnnAutoInstallStart")
+        try:
+            subprocess.run(
+                [sys.executable, "-m", "pip", "install", *_NCNN_REQUIREMENTS],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+        except Exception as e:
+            log.warning_t("yolo.log.ncnnAutoInstallFailed", error=e)
+            return False
+        ok = _refresh_ncnn_import()
+        if ok and YoloDetector.pnnx_available():
+            log.info_t("yolo.log.ncnnAutoInstallDone")
+            return True
+        log.warning_t("yolo.log.ncnnAutoInstallIncomplete")
+        return False
+
+    @staticmethod
     def select_ncnn_runtime_device():
         if not _NCNN_AVAILABLE:
             return "cpu", "ncnn"
@@ -140,6 +190,10 @@ class YoloDetector:
             )
         normalized_device = YoloDetector.normalize_device_preference(device)
         ncnn_model_path = YoloDetector.resolve_ncnn_model_path(model_path)
+        if normalized_device == "ncnn" and (
+            not YoloDetector.ncnn_available() or not YoloDetector.pnnx_available()
+        ):
+            YoloDetector.auto_install_ncnn_dependencies()
         if not os.path.exists(model_path) and not (
             normalized_device == "ncnn" and os.path.isdir(ncnn_model_path)
         ):

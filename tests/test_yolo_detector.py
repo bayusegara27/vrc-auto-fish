@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from core.yolo_detector import YoloDetector
 
@@ -51,6 +52,14 @@ class YoloDetectorTests(unittest.TestCase):
             YoloDetector.resolve_ncnn_model_path(r"E:\fish\weights\best.pt"),
             r"E:\fish\weights\best_ncnn_model",
         )
+
+    def test_can_auto_install_ncnn_is_disabled_for_frozen_builds(self):
+        with patch("core.yolo_detector.sys.frozen", True, create=True):
+            self.assertFalse(YoloDetector.can_auto_install_ncnn())
+
+    def test_auto_install_ncnn_dependencies_skips_when_frozen(self):
+        with patch("core.yolo_detector.sys.frozen", True, create=True):
+            self.assertFalse(YoloDetector.auto_install_ncnn_dependencies())
 
 
 if __name__ == "__main__":
