@@ -182,7 +182,3 @@ The release asset is a single universal package. If a usable NVIDIA CUDA environ
 
 - `.github/workflows/test.yml`: runs lightweight Windows checks on `push` and `pull_request`
 - `.github/workflows/release-build.yml`: manually builds the CUDA package and uploads a `7z` asset to the target GitHub Release
-
-## License
-
-MIT
