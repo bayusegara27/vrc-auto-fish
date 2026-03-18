@@ -1,4 +1,4 @@
-﻿"""
+"""
 Internationalization helpers.
 
 Provide a small key-based translation layer shared by the main GUI,
@@ -7,7 +7,9 @@ runtime logs, and the fish_trainer GUI.
 
 from __future__ import annotations
 
+import ctypes
 import json
+import locale
 import os
 from typing import Any
 
@@ -22,6 +24,12 @@ LANGUAGE_NAMES = {
     "ja-JP": "日本語",
 }
 TRANSLATION_RESOURCE = os.path.join("utils", "i18n.json")
+
+WINDOWS_UI_LANGUAGE_MAP = {
+    0x04: "zh-CN",
+    0x09: "en-US",
+    0x11: "ja-JP",
+}
 
 
 def _translation_file_path() -> str:
@@ -79,10 +87,9 @@ def _load_translations() -> dict[str, dict[str, str]]:
 
 
 TRANSLATIONS = _load_translations()
-_current_language = DEFAULT_LANGUAGE
 
 
-def normalize_language(lang: str | None) -> str:
+def _normalize_language_code(lang: str | None) -> str | None:
     if lang in SUPPORTED_LANGUAGES:
         return lang
     if isinstance(lang, str):
@@ -93,6 +100,47 @@ def normalize_language(lang: str | None) -> str:
             return "en-US"
         if low.startswith("ja") or low.startswith("jp"):
             return "ja-JP"
+    return None
+
+
+def _read_windows_ui_language() -> str | None:
+    if os.name != "nt":
+        return None
+    try:
+        lang_id = ctypes.windll.kernel32.GetUserDefaultUILanguage()
+    except Exception:
+        return None
+    normalized = _normalize_language_code(locale.windows_locale.get(lang_id, ""))
+    if normalized:
+        return normalized
+    return WINDOWS_UI_LANGUAGE_MAP.get(lang_id & 0xFF)
+
+
+def detect_system_language() -> str:
+    candidates = [
+        _read_windows_ui_language(),
+        locale.getlocale()[0],
+        os.environ.get("LC_ALL"),
+        os.environ.get("LC_MESSAGES"),
+        os.environ.get("LANG"),
+        os.environ.get("LANGUAGE"),
+    ]
+    for candidate in candidates:
+        normalized = _normalize_language_code(candidate)
+        if normalized:
+            return normalized
+    return DEFAULT_LANGUAGE
+
+
+_current_language = detect_system_language()
+
+
+def normalize_language(lang: str | None) -> str:
+    if isinstance(lang, str) and lang.lower() == "auto":
+        return detect_system_language()
+    normalized = _normalize_language_code(lang)
+    if normalized:
+        return normalized
     return DEFAULT_LANGUAGE
 
 

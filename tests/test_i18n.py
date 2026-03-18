@@ -1,9 +1,11 @@
 import os
 import tempfile
 import unittest
+from unittest import mock
 
 import config
 from utils.i18n import (
+    detect_system_language,
     fish_name,
     get_language,
     normalize_language,
@@ -50,6 +52,22 @@ class I18nTests(unittest.TestCase):
         self.assertEqual(normalize_language("ja"), "ja-JP")
         self.assertEqual(normalize_language("ja-jp"), "ja-JP")
         self.assertEqual(normalize_language("jp"), "ja-JP")
+
+    def test_normalize_language_supports_auto(self):
+        with mock.patch("utils.i18n.detect_system_language", return_value="en-US"):
+            self.assertEqual(normalize_language("auto"), "en-US")
+
+    def test_detect_system_language_falls_back_from_windows_locale(self):
+        with (
+            mock.patch("utils.i18n._read_windows_ui_language", return_value="ja-JP"),
+            mock.patch("utils.i18n.locale.getlocale", return_value=(None, None)),
+        ):
+            self.assertEqual(detect_system_language(), "ja-JP")
+
+    def test_read_persisted_language_uses_system_language_when_auto(self):
+        config.LANGUAGE = "auto"
+        with mock.patch("utils.i18n.detect_system_language", return_value="en-US"):
+            self.assertEqual(read_persisted_language(), "en-US")
 
     def test_fish_teal_name_is_available_in_all_languages(self):
         set_language("zh-CN")

@@ -12,9 +12,18 @@ datas = [
 if os.path.exists('imitation/policy.pt'):
     datas.append(('imitation/policy.pt', 'imitation'))
 binaries = []
-hiddenimports = ['ultralytics', 'cv2', 'keyboard', 'mss', 'PIL', 'psutil', 'win32gui', 'win32con', 'pythonosc']
-tmp_ret = collect_all('ultralytics')
-datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+hiddenimports = [
+    'ultralytics', 'ncnn', 'pnnx', 'cv2', 'keyboard', 'mss', 'PIL',
+    'psutil', 'win32gui', 'win32con', 'pythonosc'
+]
+for package_name in ('ultralytics', 'ncnn', 'pnnx'):
+    try:
+        tmp_ret = collect_all(package_name)
+    except Exception:
+        continue
+    datas += tmp_ret[0]
+    binaries += tmp_ret[1]
+    hiddenimports += tmp_ret[2]
 
 
 a = Analysis(

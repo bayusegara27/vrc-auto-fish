@@ -18,7 +18,7 @@ _APP_DIR = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else
 PATCH_DIR = os.path.join(_APP_DIR, "patch")
 DEBUG_DIR = os.path.join(_APP_DIR, "debug")
 SETTINGS_FILE = os.path.join(_APP_DIR, "settings.json")
-LANGUAGE = "ja-JP"
+LANGUAGE = "auto"
 
 
 def _resource_candidates(relative_path: str):

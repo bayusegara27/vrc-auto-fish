@@ -75,7 +75,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "Selected PyTorch channel: $env:PYTORCH_CHANNEL"
-          python -c "import cv2, torch, ultralytics; print(f'torch={torch.__version__} cuda={torch.cuda.is_available()}'); print(f'cv2={cv2.__version__}'); print(f'ultralytics={ultralytics.__version__}')"
+          python -c "import cv2, ncnn, pnnx, torch, ultralytics; print(f'torch={torch.__version__} cuda={torch.cuda.is_available()}'); print(f'cv2={cv2.__version__}'); print(f'ultralytics={ultralytics.__version__}'); print(f'ncnn={getattr(ncnn, \"__version__\", \"ok\")} pnnx={getattr(pnnx, \"__version__\", \"ok\")}')"
 
       - name: Ensure 7-Zip is available
         shell: pwsh
