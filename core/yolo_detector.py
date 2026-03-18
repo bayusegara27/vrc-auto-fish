@@ -121,10 +121,10 @@ class YoloDetector:
 
     @staticmethod
     def auto_install_ncnn_dependencies() -> bool:
-        if YoloDetector.ncnn_available() and YoloDetector.pnnx_available():
-            return True
         if not YoloDetector.can_auto_install_ncnn():
             return False
+        if YoloDetector.ncnn_available() and YoloDetector.pnnx_available():
+            return True
         log.info_t("yolo.log.ncnnAutoInstallStart")
         try:
             subprocess.run(
