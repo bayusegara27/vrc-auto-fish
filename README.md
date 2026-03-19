@@ -1,6 +1,6 @@
 # VRChat Auto Fishing Assistant (FISH!)
 Booth:https://scrtup.booth.pm/items/8095499
-
+Bilbil:https://www.bilibili.com/video/BV1cdPMzQEKh/#reply116155008163349
 I'm not very familiar with how YouTube works, so I can't really publish videos there. Most of it will have to be figured out on your own.
 
 
