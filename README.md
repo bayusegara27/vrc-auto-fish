@@ -1,5 +1,9 @@
 # VRChat Auto Fishing Assistant (FISH!)
 Booth:https://scrtup.booth.pm/items/8095499
+
+I'm not very familiar with how YouTube works, so I can't really publish videos there. Most of it will have to be figured out on your own.
+
+
 This repository now provides documentation in three languages. Choose the version you want to read:
 
 - [简体中文](README.zh-CN.md)
