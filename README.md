@@ -2,7 +2,7 @@
 Booth:https://scrtup.booth.pm/items/8095499
 Bilbil:https://www.bilibili.com/video/BV1cdPMzQEKh/#reply116155008163349
 I'm not very familiar with how YouTube works, so I can't really publish videos there. Most of it will have to be figured out on your own.
-[![Watch the video](http://xiao9jun.top:25213/f/23701291bd8540fe8a50/?dl=1)
+(http://xiao9jun.top:25213/f/23701291bd8540fe8a50/?dl=1)
 
 This repository now provides documentation in three languages. Choose the version you want to read:
 
