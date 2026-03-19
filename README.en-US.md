@@ -4,6 +4,8 @@
 
 An auto-fishing script for the VRChat world **FISH!**. It supports YOLO object detection and a PD controller to automate casting, hooking, and the fishing mini-game.
 
+I'm not very familiar with how YouTube works, so I’m not able to publish videos there myself. For now, people will mostly need to figure things out on their own. If any user is already fully familiar with how to use it and would be willing to help publish a tutorial video, I would be very grateful.
+
 ## Features
 
 - **Automatic casting / hooking**: Detects bite animations and completes the fishing loop automatically
