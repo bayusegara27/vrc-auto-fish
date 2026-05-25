@@ -77,6 +77,13 @@ jobs:
         shell: pwsh
         run: pip install pyinstaller
 
+      - name: Ensure 7-Zip is available
+        shell: pwsh
+        run: |
+          if (-not (Get-Command 7z -ErrorAction SilentlyContinue)) {
+            choco install 7zip -y
+          }
+
       - name: Build release package
         shell: pwsh
         run: python -m PyInstaller --noconfirm "VRC auto fish-CUDA.spec"
@@ -95,15 +102,32 @@ jobs:
           Write-Host "Selected PyTorch channel: $env:PYTORCH_CHANNEL"
           Get-ChildItem $outputDir | Select-Object Name, Length
 
-      - name: Package release zip
+      - name: Package release archive
         shell: pwsh
         run: |
-          $assetName = "AutoFish-$env:RELEASE_TAG-windows-x64.zip"
+          $assetName = "AutoFish-$env:RELEASE_TAG-windows-x64.7z"
           if (Test-Path $assetName) {
             Remove-Item $assetName -Force
           }
-          Compress-Archive -Path ".\dist\VRC auto fish-CUDA\*" -DestinationPath $assetName -Force
+          7z a -t7z -mx=9 -mmt=on $assetName ".\\dist\\VRC auto fish-CUDA\\*"
+          if (-not (Test-Path $assetName)) {
+            throw "Release archive was not created: $assetName"
+          }
           "RELEASE_ASSET=$assetName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Enforce GitHub release asset size limit
+        shell: pwsh
+        run: |
+          $maxBytes = 2147483648
+          $assetPath = $env:RELEASE_ASSET
+          if ([string]::IsNullOrWhiteSpace($assetPath) -or -not (Test-Path $assetPath)) {
+            throw "Release asset file is missing: $assetPath"
+          }
+          $sizeBytes = (Get-Item $assetPath).Length
+          Write-Host "Release asset size: $sizeBytes bytes"
+          if ($sizeBytes -ge $maxBytes) {
+            throw "Release asset exceeds GitHub limit (must be < $maxBytes bytes): $sizeBytes"
+          }
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4

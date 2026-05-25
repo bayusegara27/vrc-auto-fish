@@ -49,7 +49,7 @@ python main.py
 
 - 可直接从 [GitHub Releases](https://github.com/bayusegara27/vrc-auto-fish/releases) 下载现成的 Windows 打包版本。
 - 推送 `v1.2.3` 这类标签后，`.github/workflows/release.yml` 会自动构建 Windows 发布包并上传到 GitHub Releases。
-- 发布 zip 内包含打包后的 `VRC auto fish-CUDA.exe`，以及运行所需的图片、翻译、模型文件和原生依赖。
+- 发布 `7z` 压缩包内包含打包后的 `VRC auto fish-CUDA.exe`，以及运行所需的图片、翻译、模型文件和原生依赖。
 - 打包 EXE 启动时会请求管理员权限，因为发布版沿用了源码构建里的提权清单来保持输入控制行为一致。
 
 ## 使用说明
