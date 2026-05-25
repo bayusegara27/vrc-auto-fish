@@ -51,8 +51,10 @@ jobs:
         run: >
           python -m unittest
           tests.test_i18n
+          tests.test_overlay_text
           tests.test_pd_controller
           tests.test_settings_store
+          tests.test_console_logging
           tests.test_runtime_controller
           tests.test_yolo_detector
           tests.test_minigame_detection

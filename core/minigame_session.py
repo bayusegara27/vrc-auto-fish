@@ -17,6 +17,7 @@ import config
 from core.minigame_runtime import DetectionContext, MinigameRuntime, PipelineContext
 from utils.i18n import fish_name, t
 from utils.logger import log
+from utils.overlay_text import overlay_fish_name
 from yolo.paths import UNLABELED as YOLO_UNLABELED
 
 
@@ -55,7 +56,7 @@ class MinigameSession:
         bot.screen.save_debug(screen_orig, "minigame_start")
         h_orig, w_orig = screen_orig.shape[:2]
         log.info_t("bot.log.captureSize", width=w_orig, height=h_orig)
-        bot._show_debug_overlay(screen_orig, status_text=t("bot.log.minigameInit"))
+        bot._show_debug_overlay(screen_orig, status_text="Initializing minigame...")
 
         if bot._need_rotation:
             log.info_t(
@@ -261,7 +262,7 @@ class MinigameSession:
 
     def get_fish_display(self):
         return {
-            key: (fish_name(key), color)
+            key: (overlay_fish_name(key), color)
             for key, color in self.bot.FISH_COLORS.items()
         }
 
@@ -538,7 +539,7 @@ class MinigameSession:
                 bar_search_region=ctx.bar_search_region,
                 progress=None if ctx.skip_success_check else yolo_progress,
                 prog_hook=prog_hook,
-                status_text=f"🐟 小游戏 F{runtime.frame:04d}",
+                status_text=f"Minigame F{runtime.frame:04d}",
             )
         else:
             bot._show_debug_overlay(
@@ -548,8 +549,8 @@ class MinigameSession:
                 progress=None if ctx.skip_success_check else yolo_progress,
                 prog_hook=prog_hook,
                 status_text=(
-                    f"🐟 小游戏 F{runtime.frame:04d} "
-                    f"(旋转{bot._track_angle:.0f}°补偿中)"
+                    f"Minigame F{runtime.frame:04d} "
+                    f"(rotation {bot._track_angle:.0f} deg)"
                 ),
             )
 
@@ -631,7 +632,7 @@ class MinigameSession:
                 bar_search_region=ctx.bar_search_region,
                 progress=yolo_progress,
                 prog_hook=prog_hook,
-                status_text=f"🐟 小游戏 F{runtime.frame:04d}",
+                status_text=f"Minigame F{runtime.frame:04d}",
             )
         else:
             progress_sr = ctx.search_region

@@ -47,6 +47,13 @@ pip install -r requirements.txt
 python main.py
 ```
 
+## Downloads / Releases
+
+- Ready-to-use Windows builds are published on [GitHub Releases](https://github.com/bayusegara27/vrc-auto-fish/releases).
+- Pushing a tag such as `v1.2.3` runs `.github/workflows/release.yml`, builds the Windows package, and uploads a release zip automatically.
+- The release zip contains the packaged `VRC auto fish-CUDA.exe` plus bundled runtime resources such as images, translations, model files, and required native dependencies.
+- The packaged EXE requests administrator permission on launch because the bundled Windows manifest keeps the same elevated-input behavior as the source build.
+
 ## Usage
 
 1. Launch VRChat and enter the `FISH!` world
@@ -190,4 +197,5 @@ The release asset is a single universal package. If a usable NVIDIA CUDA environ
 ## GitHub Actions
 
 - `.github/workflows/test.yml`: runs lightweight Windows checks on `push` and `pull_request`
+- `.github/workflows/release.yml`: builds a Windows release on `v*` tags (or manual dispatch) and uploads the zip to GitHub Releases
 - `.github/workflows/release-build.yml`: manually builds the CUDA package and uploads a `7z` asset to the target GitHub Release

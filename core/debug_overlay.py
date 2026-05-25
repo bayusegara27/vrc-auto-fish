@@ -10,7 +10,7 @@ import time
 import cv2
 
 import config
-from utils.i18n import t
+from utils.overlay_text import overlay_text, to_ascii
 
 
 class DebugOverlay:
@@ -101,6 +101,7 @@ class DebugOverlay:
             else (0, 255, 255) if self._fps >= 5
             else (0, 0, 255)
         )
+        status_text = to_ascii(status_text)
         cv2.putText(
             debug, fps_text, (debug_w - 120, 22),
             cv2.FONT_HERSHEY_SIMPLEX, 0.6, fps_color, 2
@@ -115,7 +116,7 @@ class DebugOverlay:
 
         if need_rotation:
             cv2.putText(
-                debug, t("debug.rotation", angle=-track_angle), (8, y_txt),
+                debug, overlay_text("debug.rotation", angle=-track_angle), (8, y_txt),
                 cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 200, 255), 1
             )
             y_txt += 20
@@ -125,13 +126,13 @@ class DebugOverlay:
             bar_cy = bar[1] + bar[3] // 2
             diff = bar_cy - fish_cy
             if diff > config.DEAD_ZONE:
-                label = t("debug.barBelow", diff=diff)
+                label = overlay_text("debug.barBelow", diff=diff)
                 label_color = (0, 100, 255)
             elif diff < -config.DEAD_ZONE:
-                label = t("debug.barAbove", diff=diff)
+                label = overlay_text("debug.barAbove", diff=diff)
                 label_color = (255, 200, 0)
             else:
-                label = t("debug.deadZone", diff=diff)
+                label = overlay_text("debug.deadZone", diff=diff)
                 label_color = (0, 255, 0)
             cv2.putText(
                 debug, label, (8, y_txt),
@@ -140,7 +141,7 @@ class DebugOverlay:
             y_txt += 20
         elif fish is None and bar is None and state == "bot.state.minigame":
             cv2.putText(
-                debug, t("debug.noFishBar"), (8, y_txt),
+                debug, overlay_text("debug.noFishBar"), (8, y_txt),
                 cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 255), 1
             )
             y_txt += 20
@@ -169,6 +170,7 @@ class DebugOverlay:
             fx, fy, fw, fh = fish[:4]
             fish_cy = fy + fh // 2
             fname, fcolor = fish_display.get(current_fish_name, ("?", (0, 255, 0)))
+            fname = to_ascii(fname)
             cv2.rectangle(debug, (sx(fx), sy(fy)), (sx(fx + fw), sy(fy + fh)), fcolor, 2)
             cv2.putText(
                 debug, f"{fname} Y={fish_cy}",
@@ -182,7 +184,7 @@ class DebugOverlay:
             bar_cy = by + bh // 2
             cv2.rectangle(debug, (sx(bx), sy(by)), (sx(bx + bw), sy(by + bh)), (255, 100, 0), 2)
             cv2.putText(
-                debug, t("debug.barY", y=bar_cy), (max(0, sx(bx) - 90), sy(bar_cy)),
+                debug, overlay_text("debug.barY", y=bar_cy), (max(0, sx(bx) - 90), sy(bar_cy)),
                 cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 100, 0), 1
             )
             cv2.line(debug, (sx(bx), sy(bar_cy)), (sx(bx + bw), sy(bar_cy)), (255, 100, 0), 1)
@@ -194,7 +196,7 @@ class DebugOverlay:
                 (0, 220, 180), 2
             )
             cv2.putText(
-                debug, t("debug.progress"), (sx(px), sy(py) - 5),
+                debug, overlay_text("debug.progress"), (sx(px), sy(py) - 5),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 220, 180), 1
             )
 
@@ -219,7 +221,7 @@ class DebugOverlay:
                 thickness=2,
             )
             cv2.putText(
-                debug, t("debug.hook"), (left, top - 5),
+                debug, overlay_text("debug.hook"), (left, top - 5),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1
             )
 

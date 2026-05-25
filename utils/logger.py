@@ -5,10 +5,10 @@
 """
 
 import os
-import sys
 import time
 import queue
 
+from trainer_common.console import safe_print
 from utils.i18n import t
 
 
@@ -55,15 +55,7 @@ class Logger:
 
     @staticmethod
     def _safe_print(text: str):
-        try:
-            print(text)
-        except UnicodeEncodeError:
-            stream = sys.stdout
-            encoding = getattr(stream, "encoding", None) or "utf-8"
-            sanitized = text.encode(encoding, errors="replace").decode(
-                encoding, errors="replace"
-            )
-            print(sanitized)
+        safe_print(text)
 
     def save(self, path: str):
         """将当前所有日志覆盖写入文件"""

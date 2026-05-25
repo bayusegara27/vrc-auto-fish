@@ -13,6 +13,8 @@ This repository now provides documentation in three languages. Choose the versio
 - [English](README.en-US.md)
 - [日本語](README.ja-JP.md)
 
+Ready-to-use Windows builds are published on [GitHub Releases](https://github.com/bayusegara27/vrc-auto-fish/releases). Tagged releases such as `v1.2.3` are built automatically by `.github/workflows/release.yml`.
+
 ## Additional Docs
 
 - `VRC Auto Fish Launcher`

@@ -48,16 +48,16 @@ class ReelExitHandler:
     def perform_exit(self, success: bool) -> bool:
         """执行收杆/等待 UI 消失流程。"""
         self.input.safe_release()
-        if self._wait_with_preempt(0.5, "⏳ 收杆准备", allow_preempt=False):
+        if self._wait_with_preempt(0.5, "Preparing to reel in", allow_preempt=False):
             return success
         if getattr(config, "SKIP_SUCCESS_CHECK", False):
-            if self._wait_with_preempt(0.2, "⏳ 收杆点击前等待", allow_preempt=False):
+            if self._wait_with_preempt(0.2, "Waiting before reel click", allow_preempt=False):
                 return success
             self.input.click()
             log.info_t("reel.log.clickSkipCheck")
             success = True
         elif success:
-            if self._wait_with_preempt(0.2, "⏳ 收杆点击前等待", allow_preempt=False):
+            if self._wait_with_preempt(0.2, "Waiting before reel click", allow_preempt=False):
                 return success
             self.input.click()
             log.info_t("reel.log.clickSuccess")
@@ -78,7 +78,7 @@ class ReelExitHandler:
         """统一处理小游戏结束后的结算、收杆与返回值。"""
         if hook_timeout_retry:
             self.input.safe_release()
-            if self._wait_with_preempt(0.3, "⏳ 收杆前等待", allow_preempt=False):
+            if self._wait_with_preempt(0.3, "Waiting before reel in", allow_preempt=False):
                 return None
             self.input.click()
             self._wait_until_ui_gone(
