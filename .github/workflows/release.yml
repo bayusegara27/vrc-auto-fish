@@ -1,0 +1,124 @@
+name: Auto Release Build
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: Release tag to publish (for example v1.2.3)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Resolve release tag
+        shell: pwsh
+        run: |
+          $tagName = "${{ github.event.inputs.tag_name }}"
+          if ([string]::IsNullOrWhiteSpace($tagName)) {
+            $tagName = "${{ github.ref_name }}"
+          }
+          if ([string]::IsNullOrWhiteSpace($tagName)) {
+            throw "No release tag was provided."
+          }
+          "RELEASE_TAG=$tagName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Upgrade pip
+        shell: pwsh
+        run: python -m pip install --upgrade pip
+
+      - name: Install PyTorch with fallback
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $channels = @(
+            @{ Label = "cu128"; Url = "https://download.pytorch.org/whl/cu128" },
+            @{ Label = "cu118"; Url = "https://download.pytorch.org/whl/cu118" },
+            @{ Label = "cpu"; Url = "https://download.pytorch.org/whl/cpu" }
+          )
+          foreach ($channel in $channels) {
+            Write-Host "Trying PyTorch channel: $($channel.Label)"
+            try {
+              python -m pip install torch torchvision --index-url $channel.Url
+              if ($LASTEXITCODE -eq 0) {
+                "PYTORCH_CHANNEL=$($channel.Label)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+                exit 0
+              }
+            } catch {
+              Write-Warning "PyTorch install failed on channel $($channel.Label): $_"
+            }
+          }
+          throw "Failed to install PyTorch from cu128, cu118, and cpu channels."
+
+      - name: Install project requirements
+        shell: pwsh
+        run: pip install -r requirements.txt
+
+      - name: Install build tools
+        shell: pwsh
+        run: pip install pyinstaller
+
+      - name: Build release package
+        shell: pwsh
+        run: python -m PyInstaller --noconfirm "VRC auto fish-CUDA.spec"
+
+      - name: Validate build output
+        shell: pwsh
+        run: |
+          $outputDir = "dist/VRC auto fish-CUDA"
+          $exePath = Join-Path $outputDir "VRC auto fish-CUDA.exe"
+          if (-not (Test-Path $outputDir)) {
+            throw "Build output folder not found: $outputDir"
+          }
+          if (-not (Test-Path $exePath)) {
+            throw "Built executable not found: $exePath"
+          }
+          Write-Host "Selected PyTorch channel: $env:PYTORCH_CHANNEL"
+          Get-ChildItem $outputDir | Select-Object Name, Length
+
+      - name: Package release zip
+        shell: pwsh
+        run: |
+          $assetName = "AutoFish-$env:RELEASE_TAG-windows-x64.zip"
+          if (Test-Path $assetName) {
+            Remove-Item $assetName -Force
+          }
+          Compress-Archive -Path ".\dist\VRC auto fish-CUDA\*" -DestinationPath $assetName -Force
+          "RELEASE_ASSET=$assetName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.RELEASE_ASSET }}
+          path: ${{ env.RELEASE_ASSET }}
+
+      - name: Create or update GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view $env:RELEASE_TAG *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $env:RELEASE_TAG $env:RELEASE_ASSET --clobber
+          } else {
+            gh release create $env:RELEASE_TAG $env:RELEASE_ASSET --title $env:RELEASE_TAG --notes "Automated Windows build for $env:RELEASE_TAG." --target $env:GITHUB_SHA
+          }

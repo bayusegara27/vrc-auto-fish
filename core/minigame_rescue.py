@@ -43,7 +43,7 @@ class RescueService:
                 self._show_overlay(
                     rescue_screen, rescue_fish, rescue_bar,
                     progress=None if skip_success_check else rescue_progress,
-                    status_text=f"⚠ {reason} 前抢回 PD"
+                    status_text="Rescuing PD control"
                 )
                 log.warning(
                     f"[⚠ 抢回] {reason} 前重新检测到有效鱼+条，继续 PD 控制"

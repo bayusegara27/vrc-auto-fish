@@ -5,6 +5,7 @@ from unittest import mock
 
 import config
 from utils.i18n import (
+    TRANSLATIONS,
     detect_system_language,
     fish_name,
     get_language,
@@ -100,6 +101,16 @@ class I18nTests(unittest.TestCase):
         self.assertEqual(fish_name("fish_relic"), "遺物")
         self.assertEqual(fish_name("fish_black"), "黒魚")
         self.assertEqual(fish_name("fish_question"), "はてな魚")
+
+    def test_translation_languages_have_identical_key_sets(self):
+        key_sets = {lang: set(entries.keys()) for lang, entries in TRANSLATIONS.items()}
+        self.assertEqual(key_sets["zh-CN"], key_sets["en-US"])
+        self.assertEqual(key_sets["zh-CN"], key_sets["ja-JP"])
+
+    def test_missing_translation_key_uses_default_or_key(self):
+        set_language("en-US")
+        self.assertEqual(t("missing.translation", default="Fallback"), "Fallback")
+        self.assertEqual(t("missing.translation"), "missing.translation")
 
 
 if __name__ == "__main__":

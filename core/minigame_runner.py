@@ -89,7 +89,7 @@ class MinigameRunner:
                             break
                         bot._show_debug_overlay(
                             screen_raw,
-                            status_text=f"⚠ 丢失中 {runtime.no_detect}/{config.VERIFY_FRAMES}"
+                            status_text=f"Lost {runtime.no_detect}/{config.VERIFY_FRAMES}"
                         )
                         continue
 

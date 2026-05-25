@@ -245,7 +245,7 @@ class FishingBot:
             log.info_t("bot.log.castRecord")
         else:
             self.input.click()
-            if self._wait_with_minigame_preempt(0.15, "🎣 抛竿后摇杆等待"):
+            if self._wait_with_minigame_preempt(0.15, "Post-cast anti-stuck wait"):
                 return True
             mode = getattr(config, "ANTI_STUCK_MODE", "jump")
             if mode == "jump":
@@ -258,10 +258,10 @@ class FishingBot:
         try:
             screen = self._grab()
             self._tick_fps()
-            self._show_debug_overlay(screen, status_text="🎣 抛竿中...")
+            self._show_debug_overlay(screen, status_text="Casting...")
         except Exception:
             pass
-        return self._wait_with_minigame_preempt(config.CAST_DELAY, "🎣 抛竿冷却")
+        return self._wait_with_minigame_preempt(config.CAST_DELAY, "Casting cooldown")
 
     # ══════════════════════════════════════════════════════
     #  第2步: 等待咬钩
@@ -334,7 +334,7 @@ class FishingBot:
                 clear_count = 0
                 self._show_debug_overlay(
                     screen, fish, bar, progress=progress,
-                    status_text="⏳ 本局小游戏UI仍存在，等待退场..."
+                    status_text="Current minigame UI still visible..."
                 )
                 time.sleep(0.05)
                 continue
@@ -344,13 +344,13 @@ class FishingBot:
                 clear_count = 0
                 self._show_debug_overlay(
                     screen,
-                    status_text="⏳ 等待上一轮小游戏UI消失..."
+                    status_text="Waiting for previous UI to disappear..."
                 )
             else:
                 clear_count += 1
                 self._show_debug_overlay(
                     screen,
-                    status_text=f"✅ UI退场确认 {clear_count}/{clear_frames}"
+                    status_text=f"UI cleared {clear_count}/{clear_frames}"
                 )
                 if clear_count >= clear_frames:
                     return True
@@ -406,7 +406,7 @@ class FishingBot:
             )
 
             if allow_preempt and ready:
-                self._set_minigame_preempt(f"{self.state} 阶段已满足小游戏条件")
+                self._set_minigame_preempt(f"{self.state} stage satisfied minigame conditions")
                 return True
 
             time.sleep(0.05)
@@ -419,12 +419,12 @@ class FishingBot:
             log.info_t("bot.log.manualHookRecord")
         else:
             log.info_t("bot.log.manualHookClick")
-            if self._wait_with_minigame_preempt(config.HOOK_PRE_DELAY, "🪝 提竿前等待"):
+            if self._wait_with_minigame_preempt(config.HOOK_PRE_DELAY, "Pre-hook wait"):
                 return True
             self.input.click()
         # ★ 提竿后短暂等待, 持续刷新 debug 窗口
         return self._wait_with_minigame_preempt(
-            config.HOOK_POST_DELAY, "🪝 提竿后等待小游戏UI")
+            config.HOOK_POST_DELAY, "Waiting for minigame UI")
 
     def _wait_for_minigame_ui(self) -> bool:
         """
@@ -441,7 +441,7 @@ class FishingBot:
             self._tick_fps()
             self._show_debug_overlay(
                 screen,
-                status_text=f"[IL] 等待小游戏... ({consecutive}/{required})"
+                status_text=f"[IL] Waiting for minigame... ({consecutive}/{required})"
             )
 
             bar = self.detector.find_multiscale(
@@ -580,7 +580,7 @@ class FishingBot:
                 self._show_debug_overlay(
                     wait_screen, pre_fish, pre_bar,
                     progress=pre_progress if use_yolo else None,
-                    status_text=f"⏳ 等待提竿 ({wait_elapsed:.0f}/{wait_s:.0f}s)"
+                    status_text=f"Waiting to hook ({wait_elapsed:.0f}/{wait_s:.0f}s)"
                 )
 
                 if pre_fish is not None:
@@ -1103,7 +1103,7 @@ class FishingBot:
                 if result is None:
                     self.state = "bot.state.waitRecast"
                     self._wait_with_minigame_preempt(
-                        config.POST_CATCH_DELAY, "⏳ 等待重抛")
+                        config.POST_CATCH_DELAY, "Waiting to recast")
                     log.info_t("bot.log.separator")
                     continue
 
@@ -1117,12 +1117,12 @@ class FishingBot:
 
                 self.state = "bot.state.waitNextRound"
                 self._wait_with_minigame_preempt(
-                    config.POST_CATCH_DELAY, "⏳ 等待下一轮")
+                    config.POST_CATCH_DELAY, "Waiting for next round")
             except Exception as e:
                 log.error_t("bot.log.runException", error=e)
                 if not config.IL_RECORD:
                     self.input.safe_release()
-                self._wait_with_minigame_preempt(2.0, "⚠ 异常恢复等待")
+                self._wait_with_minigame_preempt(2.0, "Recovery wait")
 
         if not config.IL_RECORD:
             self.input.safe_release()
